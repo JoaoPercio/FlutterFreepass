@@ -25,35 +25,35 @@ class LoginPage extends StatelessWidget {
   late User? user;
 
   // funçao que faz a requsiçao pro back end
-  Future<int> submit() async{
+  Future<int> submit() async {
     //url da requisiçao
     const url = 'http://10.0.2.2:5000/api/user/login';
     //criando um JSON para requisiçao
-    var body = json
-        .encode({'email': email, 'password': password});
+    print('O valor de email e $email');
+    print('O valor de password e $password');
+
+    var body = json.encode({'email': email, 'password': password});
+    print(body);
     //fazendo a requisiçao
-      final response = await http.post(Uri.parse(url),
-          headers: {"Content-Type": "application/json"}, body: body);
-      // vendo o id o usuario retornado
-      print(response.body);
-      // se a requisiçao foi ok status 200
-      if (response.statusCode == 200) {
-        //salvando o id do usuario para outras requisiçoes no aplicativo, exemplo de como usar o id_salvo lá na funçao excluir usuario
-        final preferences = await SharedPreferences.getInstance();
-        await preferences.setString('user_id', response.body);
-         print("Pelo menos fez a requisiçao");
-         return 1;
-      }
-      // se o status é 500 o cadastro do mano ainda nao foi validado
-      if (response.statusCode == 500){
-        return 2;
-
-      }
-      //se deu outro status retorna 0;
-      return 0;
+    final response = await http.post(Uri.parse(url),
+        headers: {"Content-Type": "application/json"}, body: body);
+    // vendo o id o usuario retornado
+    print(response.body);
+    // se a requisiçao foi ok status 200
+    if (response.statusCode == 200) {
+      //salvando o id do usuario para outras requisiçoes no aplicativo, exemplo de como usar o id_salvo lá na funçao excluir usuario
+      final preferences = await SharedPreferences.getInstance();
+      await preferences.setString('user_id', response.body);
+      print("Pelo menos fez a requisiçao");
+      return 1;
     }
-
-
+    // se o status é 500 o cadastro do mano ainda nao foi validado
+    if (response.statusCode == 500) {
+      return 2;
+    }
+    //se deu outro status retorna 0;
+    return 0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,16 +121,17 @@ class LoginPage extends StatelessWidget {
                                 onPressed: () {
                                   //chamando a funçao de login
                                   submit().then((int valorRetornado) {
-                                    print("O valor retornado pela função submit() é: $valorRetornado");
+                                    print(
+                                        "O valor retornado pela função submit() é: $valorRetornado");
 
                                     if (valorRetornado == 1) {
                                       Navigator.of(context)
-                                          .pushReplacementNamed(AppRoutes.HOME, arguments: "1");
+                                          .pushReplacementNamed(AppRoutes.HOME,
+                                              arguments: "1");
                                     } else if (valorRetornado == 2) {
                                       showDialog(
                                           context: context,
-                                          builder: (context) =>
-                                              AlertDialog(
+                                          builder: (context) => AlertDialog(
                                                 title: Text(
                                                     'Seu Cadastro Ainda não Foi Aprovado!'),
                                                 content: Text(
@@ -147,8 +148,7 @@ class LoginPage extends StatelessWidget {
                                     } else {
                                       showDialog(
                                           context: context,
-                                          builder: (context) =>
-                                              AlertDialog(
+                                          builder: (context) => AlertDialog(
                                                 title: Text(
                                                     'email ou senha incorreto!'),
                                                 content: Text(
